@@ -10,7 +10,7 @@ namespace Installers
         public override void InstallBindings()
         {
             SignalBusInstaller.Install(Container);
-            foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsAssignableFrom(typeof(ISignal))))
+            foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(x => typeof(ISignal).IsAssignableFrom(x) && !x.IsAbstract))
             {
                 Container.DeclareSignal(type).OptionalSubscriber();
             }

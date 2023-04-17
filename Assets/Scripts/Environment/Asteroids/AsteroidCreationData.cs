@@ -8,6 +8,7 @@ namespace Environment.Asteroids
     [Serializable]
     public class AsteroidCreationData
     {
-        [field: SerializeField] public Grid Grid { get; private set; }
+        [field: SerializeField] public Grid Grid { get; set; }
+        public Vector2Int StartPos { get; set; }
     }
 }

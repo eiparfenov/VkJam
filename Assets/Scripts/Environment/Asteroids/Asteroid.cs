@@ -21,7 +21,9 @@ namespace Environment.Asteroids
         private readonly SignalBus _signalBus;
         private bool _isPlaced;
 
-
+        public Vector2Int Position => ((Vector2)_transform.position).RoundToVector2Int();
+        public Grid GridSelf => _creationData.Grid;
+        
         public Asteroid(DragAble dragAble, IMover mover, Tilemap tilemap, TileBase asteroidTile, AsteroidCreationData creationData, Transform transform, SignalBus signalBus)
         {
             _dragAble = dragAble;
@@ -31,6 +33,8 @@ namespace Environment.Asteroids
             _creationData = creationData;
             _transform = transform;
             _signalBus = signalBus;
+
+            _transform.position = creationData.StartPos.ToVector3Int();
         }
 
         public bool IsPlaced

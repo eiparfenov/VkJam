@@ -17,6 +17,11 @@ namespace Grids
         {
             _cells = new HashSet<Vector2Int>();
         }
+
+        public Grid(IEnumerable<Vector2Int> cells)
+        {
+            _cells = new HashSet<Vector2Int>(cells);
+        }
         
         public IEnumerable<Vector2Int> AllCells => _cells;
         public bool this[int x, int y]
@@ -52,6 +57,15 @@ namespace Grids
         public void UnionWith(Grid other, Vector2Int offset)
         {
             _cells.UnionWith(other._cells.Select(x => x + offset));
+        }
+
+        public bool PossibleToAddWithSide(Grid other, Vector2Int offset, int side)
+        {
+            return !other._cells
+                .SelectMany(x => new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right, Vector2Int.zero }
+                    .Select(dopOffset => dopOffset * side + offset + x))
+                .Intersect(_cells)
+                .Any();
         }
 
 
