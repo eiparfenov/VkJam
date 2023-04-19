@@ -19,12 +19,14 @@ namespace Environment.Asteroids
         private readonly AsteroidCreationData _creationData;
         private readonly Transform _transform;
         private readonly SignalBus _signalBus;
+        private readonly Rigidbody2D _rb;
         private bool _isPlaced;
 
         public Vector2Int Position => ((Vector2)_transform.position).RoundToVector2Int();
         public Grid GridSelf => _creationData.Grid;
-        
-        public Asteroid(DragAble dragAble, IMover mover, Tilemap tilemap, TileBase asteroidTile, AsteroidCreationData creationData, Transform transform, SignalBus signalBus)
+
+        public Asteroid(DragAble dragAble, IMover mover, Tilemap tilemap, TileBase asteroidTile,
+            AsteroidCreationData creationData, Transform transform, SignalBus signalBus, Rigidbody2D rb)
         {
             _dragAble = dragAble;
             _mover = mover;
@@ -33,7 +35,8 @@ namespace Environment.Asteroids
             _creationData = creationData;
             _transform = transform;
             _signalBus = signalBus;
-
+            _rb = rb;
+            
             _transform.position = creationData.StartPos.ToVector3Int();
         }
 
@@ -60,6 +63,8 @@ namespace Environment.Asteroids
 
         private async void DragHandler()
         {
+            if(_isPlaced) return;
+            _rb.bodyType = RigidbodyType2D.Dynamic;
             while (_dragAble.IsDragging)
             {
                 _mover.MoveTo(_dragAble.Target);
@@ -79,6 +84,8 @@ namespace Environment.Asteroids
                     Invoker = this,
                     Offset = ((Vector2)_transform.position).RoundToVector2Int()
                 });
+                _rb.bodyType = RigidbodyType2D.Static;
+                _transform.position = ((Vector2)_transform.position).RoundToInt();
             }
         }
 

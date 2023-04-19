@@ -485,6 +485,7 @@ GameObject:
   - component: {fileID: 2085871866}
   - component: {fileID: 2085871865}
   - component: {fileID: 2085871867}
+  - component: {fileID: 2085871868}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -506,8 +507,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers:
   - {fileID: 11400000, guid: c135587336f8bd54e8a15691b476ab93, type: 2}
+  - {fileID: 11400000, guid: 944aac954fb5f0743862e9a0c93f32c4, type: 2}
   _monoInstallers:
   - {fileID: 2085871867}
+  - {fileID: 2085871868}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -555,3 +558,17 @@ MonoBehaviour:
   asteroidPref: {fileID: 245254766017095203, guid: 19277245519fdac49a8e0766ab452c49, type: 3}
   asteroidCreationData: {}
   asteroidTile: {fileID: 11400000, guid: 095037876e0c6b245aac3d8bff5b2834, type: 2}
+--- !u!114 &2085871868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2085871863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bede45dd41e45fd8301c4629261aaf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 3723567770091022655, guid: a95262fcd08097d4cadcb2ec436ba5b9, type: 3}
+  camera: {fileID: 519420031}

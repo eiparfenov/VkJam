@@ -50,8 +50,7 @@ namespace Grids
             return other._cells
                 .SelectMany(x => new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right }
                     .Select(dopOffset => dopOffset + offset + x))
-                .Intersect(_cells)
-                .Count();
+                .Count(x => _cells.Contains(x));
         }
 
         public void UnionWith(Grid other, Vector2Int offset)

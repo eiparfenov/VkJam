@@ -40,6 +40,7 @@ namespace Environment.Asteroids
             if (sides == 0) return;
             
             _signalBus.Fire(new AsteroidAddToMainSignal(){Energy = sides});
+            _mainGrid.UnionWith(signal.GridSelf, signal.Offset);
             signal.Invoker.IsPlaced = true;
         }
     }

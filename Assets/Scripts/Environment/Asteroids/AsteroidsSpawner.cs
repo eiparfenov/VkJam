@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Installers;
 using Signals;
@@ -7,15 +9,19 @@ using UnityEngine;
 using Utils.Extensions;
 using Zenject;
 using Grid = Grids.Grid;
+using Random = UnityEngine.Random;
 
 namespace Environment.Asteroids
 {
-    public class AsteroidsSpawner: IInitializable
+    public class AsteroidsSpawner: IInitializable, IDisposable
     {
         private readonly Asteroid.Factory _asteroidFactory;
         private readonly AsteroidSpawnerSettings _settings;
         private readonly SignalBus _signalBus;
         private readonly List<Asteroid> _asteroids;
+
+        private readonly CancellationTokenSource _tokenSource;
+        private bool _isWorking;
 
         public AsteroidsSpawner(Asteroid.Factory asteroidFactory, AsteroidSpawnerSettings settings, SignalBus signalBus)
         {
@@ -23,39 +29,52 @@ namespace Environment.Asteroids
             _asteroids = new List<Asteroid>();
             _signalBus = signalBus;
             _settings = settings;
+            
+            _signalBus.Subscribe<PlayerMoveSignal>(CreateAsteroid);
+            _tokenSource = new CancellationTokenSource();
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
             var asteroidFirst = _asteroidFactory.Create(new AsteroidCreationData()
             {
                 Grid = Grid.RandomByCellsCount(_settings.StartAsteroidSize),
-                StartPos = _settings.FieldSize
+                StartPos = Vector2Int.zero
             });
+            asteroidFirst.IsPlaced = true;
             _asteroids.Add(asteroidFirst);
             _signalBus.Fire(new StartAsteroidCreatedSignal(){StartAsteroid = asteroidFirst});
-            await CreateAsteroid();
         }
 
-        private async UniTask CreateAsteroid()
+        private async void CreateAsteroid(PlayerMoveSignal signal)
         {
+            if(_isWorking) return;
+            _isWorking = true;
             var asteroidGrid = Grid.RandomByCellsCount(Random.Range(_settings.CreatedAsteroidMinSize, _settings.CreatedAsteroidMaxSize));
-            while(true)
+            
+            foreach (var fieldToAdd in signal.FoV.Rect().Select(x => x + signal.Position))
             {
-                foreach (var fieldToAdd in (_settings.FieldSize * 2).AllInside())
+                if(_tokenSource.Token.IsCancellationRequested) return;
+                if (_asteroids.Select(asteroid =>
+                        asteroid.GridSelf.PossibleToAddWithSide(asteroidGrid, fieldToAdd - asteroid.Position, _settings.SidesOffset))
+                .All(x => x))
                 {
-                    if (_asteroids.Select(asteroid =>
-                            asteroid.GridSelf.PossibleToAddWithSide(asteroidGrid, fieldToAdd - asteroid.Position, _settings.SidesOffset))
-                    .All(x => x))
-                    {
-                        var asteroid = _asteroidFactory.Create(new AsteroidCreationData()
-                            { StartPos = fieldToAdd, Grid = asteroidGrid });
-                        _asteroids.Add(asteroid);
-                        asteroidGrid = Grid.RandomByCellsCount(Random.Range(_settings.CreatedAsteroidMinSize, _settings.CreatedAsteroidMaxSize));
-                    }
+                    var asteroid = _asteroidFactory.Create(new AsteroidCreationData()
+                        { StartPos = fieldToAdd, Grid = asteroidGrid });
+                    _asteroids.Add(asteroid);
+                    asteroidGrid = Grid.RandomByCellsCount(Random.Range(_settings.CreatedAsteroidMinSize, _settings.CreatedAsteroidMaxSize));
                 }
-                await UniTask.Delay(1000);
+
+                await UniTask.Yield(PlayerLoopTiming.Update);
             }
+
+            _isWorking = false;
+        }
+
+        public void Dispose()
+        {
+            _signalBus.Unsubscribe<PlayerMoveSignal>(CreateAsteroid);
+            _tokenSource.Cancel();
         }
     }
 }

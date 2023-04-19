@@ -1,17 +1,25 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Environment.Asteroids
 {
     public class DragAble: MonoBehaviour
     {
+        private Rigidbody2D _rb;
         private Vector2 _offset;
         private Vector2 _target;
         private bool _isDragging;
 
         public Vector2 Target => _target;
         public bool IsDragging => _isDragging;
-        public event Action onDragStart; 
+        public event Action onDragStart;
+
+        [Inject]
+        public void Construct(Rigidbody2D rb)
+        {
+            _rb = rb;
+        }
 
         private void OnMouseDown()
         {

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using Signals;
+using UnityEngine;
 using Zenject;
 
 namespace Installers
@@ -14,6 +15,9 @@ namespace Installers
             {
                 Container.DeclareSignal(type).OptionalSubscriber();
             }
+
+            Container.BindSignal<AsteroidAddToMainSignal>()
+                .ToMethod(x => Debug.Log($"Gained {x.Energy} energy."));
         }
     }
 }
