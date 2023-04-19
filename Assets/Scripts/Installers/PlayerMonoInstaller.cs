@@ -10,7 +10,7 @@ namespace Installers
         [SerializeField] private Camera camera;
         public override void InstallBindings()
         {
-            Container.BindInstance(camera.transform).WithId("Camera").AsSingle();
+            Container.BindInstance(camera.transform).WithId("Camera").AsCached().WhenInjectedInto<CameraController>();
             Container.BindInstance(camera).AsSingle();
             Container.Bind<Player>()
                 .FromSubContainerResolve()

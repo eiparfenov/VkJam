@@ -14,16 +14,6 @@ namespace Installers
         [SerializeField] private TileBase asteroidTile;
         public override void InstallBindings()
         {
-            //var grid1 = new Grid(new[]
-            //{
-            //    new Vector2Int(0, 0)
-            //});
-            //var grid2 = new Grid(new[]
-            //{
-            //    new Vector2Int(0, 1)
-            //});
-            //var offset = new Vector2Int(0, -1);
-            //print(grid1.PossibleToAdd(Grid));
             Container.BindInstance(asteroidTile).AsSingle().WhenInjectedInto<Asteroid>();
             Container.BindFactory<AsteroidCreationData, Asteroid, Asteroid.Factory>()
                 .FromSubContainerResolve()

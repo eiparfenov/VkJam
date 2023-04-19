@@ -7,12 +7,10 @@ namespace Environment.Asteroids
 {
     public class MainAsteroid: IInitializable, IDisposable
     {
-        private readonly Asteroid.Factory _asteroidFactory;
         private readonly SignalBus _signalBus;
         private Grid _mainGrid;
-        public MainAsteroid(Asteroid.Factory asteroidFactory, SignalBus signalBus)
+        public MainAsteroid( SignalBus signalBus)
         {
-            _asteroidFactory = asteroidFactory;
             _signalBus = signalBus;
             _mainGrid = new Grid();
         }

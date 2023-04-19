@@ -16,8 +16,9 @@ namespace Installers
                 Container.DeclareSignal(type).OptionalSubscriber();
             }
 
-            Container.BindSignal<AsteroidAddToMainSignal>()
-                .ToMethod(x => Debug.Log($"Gained {x.Energy} energy."));
+            Container.DeclareSignalWithInterfaces<TempInventoryOpenSignal>().OptionalSubscriber();
+            //Container.BindSignal<AsteroidAddToMainSignal>()
+            //    .ToMethod(x => Debug.Log($"Gained {x.Energy} energy."));
         }
     }
 }

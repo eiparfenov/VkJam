@@ -10,7 +10,7 @@ namespace Installers
         public override void InstallBindings()
         {
             Container.Bind<Rigidbody2D>().FromComponentOnRoot().AsSingle();
-            Container.Bind<Transform>().WithId("Player").FromComponentOnRoot().AsSingle();
+            Container.Bind<Transform>().WithId("Player").FromComponentOnRoot().AsCached();
             Container.BindInterfacesAndSelfTo<WasdMovementControl>().AsSingle();
             Container.Bind<GroundChecker>().FromComponentsInHierarchy().AsCached();
             Container.BindInterfacesAndSelfTo<CameraController>().AsSingle().NonLazy();
