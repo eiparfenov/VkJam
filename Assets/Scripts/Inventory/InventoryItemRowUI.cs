@@ -5,11 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using Object = UnityEngine.Object;
 
 namespace Inventory
 {
-    public class InventoryItemRowUI: IDisposable
+    public class InventoryItemRowUI: IDisposable, IInventoryDragItemProvider
     {
         public class Factory : PlaceholderFactory<ItemData, InventoryItemRowUI> { }
         private readonly DragAbleUI _dragAbleUI;
@@ -18,6 +17,7 @@ namespace Inventory
         private readonly TextMeshProUGUI _description;
         private readonly TextMeshProUGUI _count;
         private readonly TextMeshProUGUI _name;
+        private readonly InventoryItemUI.Factory _inventoryItemUiFactory;
         public int Count
         {
             get => int.Parse(_count.text);
@@ -25,7 +25,7 @@ namespace Inventory
         }
 
         public InventoryItemRowUI(DragAbleUI dragAbleUI, ItemData itemData, Image[] images, 
-            TextMeshProUGUI[] texts)
+            TextMeshProUGUI[] texts, InventoryItemUI.Factory inventoryItemUiFactory)
         {
             _dragAbleUI = dragAbleUI;
             _itemData = itemData;
@@ -33,6 +33,7 @@ namespace Inventory
             _description = texts.First(x => x.name == "Description");
             _count = texts.First(x => x.name == "Count");
             _name = texts.First(x => x.name == "Name");
+            _inventoryItemUiFactory = inventoryItemUiFactory;
             
             _dragAbleUI.onDragStarted += DragAbleUIOnDragStarted;
             _dragAbleUI.onDragProgress += DragAbleUIOnDragProgress;
@@ -42,9 +43,9 @@ namespace Inventory
         }
 
         public ItemData ItemData => _itemData;
-        public event Action<Vector2, InventoryItemUI> onDragStarted; 
-        public event Action<Vector2, InventoryItemUI> onDragProcess; 
-        public event Action<Vector2, InventoryItemUI> onDragFinished;
+        public event Action<Vector2, InventoryItemUI, IInventoryDragItemProvider> onDragStarted; 
+        public event Action<Vector2> onDragProcess; 
+        public event Action onDragFinished;
 
         private void DisplayItem()
         {
@@ -56,17 +57,18 @@ namespace Inventory
 
         private void DragAbleUIOnDragFinished(Vector2 obj)
         {
-            
+            onDragFinished?.Invoke();
         }
 
         private void DragAbleUIOnDragProgress(Vector2 obj)
         {
-            
+            onDragProcess?.Invoke(obj);
         }
 
         private void DragAbleUIOnDragStarted(Vector2 obj)
         {
-            Debug.Log(obj);
+            var item = _inventoryItemUiFactory.Create(_itemData);
+            onDragStarted?.Invoke(obj, item, this);
         }
         
         public void Dispose()

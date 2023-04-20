@@ -16,4 +16,17 @@ namespace Items
             Input, Output
         }
     }
+
+    public static class PortTypeExtension
+    {
+        public static Port.Type Opposite(this Port.Type port)
+        {
+            return port switch
+            {
+                Port.Type.Input => Port.Type.Output,
+                Port.Type.Output => Port.Type.Input,
+                _ => throw new ArgumentOutOfRangeException(nameof(port), port, null)
+            };
+        }
+    }
 }
