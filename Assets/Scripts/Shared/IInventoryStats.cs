@@ -5,6 +5,14 @@ namespace Shared
 {
     public interface IInventoryStats
     {
-        public List<(ItemData, int)?> CollectedItems { get; }
+        List<InventorySlot> CollectedItems { get; }
+        void AddItem(ItemData itemData);
+        void RemoveItem(ItemData itemData);
+    }
+
+    public class InventorySlot
+    {
+        public ItemData ItemData { get; set; }
+        public int Count { get; set; }
     }
 }

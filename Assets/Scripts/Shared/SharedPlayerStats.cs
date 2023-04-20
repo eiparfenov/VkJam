@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Installers;
 using Items;
 
@@ -8,13 +9,36 @@ namespace Shared
     {
         public SharedPlayerStats(PlayerSettings playerSettings)
         {
-            CollectedItems = new List<(ItemData, int)?>();
+            CollectedItems = new List<InventorySlot>();
             foreach (var startItem in playerSettings.StartItems)
             {
-                CollectedItems.Add((startItem.ItemData, startItem.Count));
+                CollectedItems.Add(new InventorySlot(){Count = startItem.Count, ItemData = startItem.ItemData});
             }
         }
 
-        public List<(ItemData, int)?> CollectedItems { get; private set; }
+        public List<InventorySlot> CollectedItems { get; private set; }
+        public void AddItem(ItemData itemData)
+        {
+            var slot = CollectedItems.FirstOrDefault(x => x.ItemData == itemData);
+            if (slot == null)
+            {
+                CollectedItems.Add(new InventorySlot(){Count = 1, ItemData = itemData});
+            }
+            else
+            {
+                slot.Count += 1;
+            }
+        }
+
+        public void RemoveItem(ItemData itemData)
+        {
+            var slot = CollectedItems.FirstOrDefault(x => x.ItemData == itemData);
+            if(slot == null) return;
+            slot.Count -= 1;
+            if (slot.Count == 0)
+            {
+                CollectedItems.Remove(slot);
+            }
+        }
     }
 }

@@ -63,15 +63,15 @@ namespace Inventory
             RefreshItemRows();
             
         }
-        private void RefreshItemRows()
+        private void RefreshItemRows(bool destroyZero = true)
         {
             foreach (var inventoryItemRowUI in _inventoryItemRows)
             {
                 var inventoryItem = _inventoryStats.CollectedItems
-                    .FirstOrDefault(x => x != null && x.Value.Item1 == inventoryItemRowUI.ItemData);
+                    .FirstOrDefault(x => x != null && x.ItemData == inventoryItemRowUI.ItemData);
 
-                inventoryItemRowUI.Count = inventoryItem?.Item2 ?? 0;
-                if (inventoryItemRowUI.Count == 0)
+                inventoryItemRowUI.Count = inventoryItem?.Count?? 0;
+                if (inventoryItemRowUI.Count == 0 && destroyZero)
                 {
                     inventoryItemRowUI.Dispose();
                 }
@@ -88,10 +88,10 @@ namespace Inventory
             {
                 if(collectedItem is null) break;
                 var rowItem = _inventoryItemRows
-                    .FirstOrDefault(x => x.ItemData == collectedItem.Value.Item1);
+                    .FirstOrDefault(x => x.ItemData == collectedItem.ItemData);
                 if (rowItem != null) break;
-                var inventoryRowItem = _rowFactory.Create(collectedItem.Value.Item1);
-                inventoryRowItem.Count = collectedItem.Value.Item2;
+                var inventoryRowItem = _rowFactory.Create(collectedItem.ItemData);
+                inventoryRowItem.Count = collectedItem.Count;
                 inventoryRowItem.onDragStarted += ItemDragHandler;
                 _inventoryItemRows.Add(inventoryRowItem);
             }
@@ -100,7 +100,15 @@ namespace Inventory
         private async void ItemDragHandler(Vector2 pos, InventoryItemUI item, IInventoryDragItemProvider dragSource)
         {
             item.SetParent(_dragContainer);
-            if(item.Offset.HasValue) _inventoryProcessor.UnPin(item.Offset.Value);
+            if (item.Offset.HasValue)
+            {
+                _inventoryProcessor.UnPin(item.Offset.Value);
+            }
+            else
+            {
+                _inventoryStats.RemoveItem(item.ItemData);
+                RefreshItemRows(false);
+            }
             
             var grid = new Grids.Grid(dragSource.ItemData.Cells);
             var dragging = true;
@@ -124,6 +132,7 @@ namespace Inventory
             dragSource.onDragFinished -= onStop;
             if (!_cellsGrid.IsPointInside(pos))
             {
+                _inventoryStats.AddItem(item.ItemData);
                 item.onDragStarted -= ItemDragHandler;
                 item.Dispose();
             }
@@ -134,6 +143,7 @@ namespace Inventory
                 Vector2Int? positionToPlace = possibleToPlace ? new Vector2Int?(posOnGrid) : item.Offset;
                 if (!positionToPlace.HasValue)
                 {
+                    _inventoryStats.AddItem(item.ItemData);
                     item.onDragStarted -= ItemDragHandler;
                     item.Dispose();
                 }
