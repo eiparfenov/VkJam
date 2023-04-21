@@ -71,25 +71,25 @@ namespace Inventory
                     .FirstOrDefault(x => x != null && x.ItemData == inventoryItemRowUI.ItemData);
 
                 inventoryItemRowUI.Count = inventoryItem?.Count?? 0;
-                if (inventoryItemRowUI.Count == 0 && destroyZero)
-                {
-                    inventoryItemRowUI.Dispose();
-                }
+                
             }
 
-            foreach (var itemRowUI in _inventoryItemRows.Where(x => x.Count == 0))
+            if (destroyZero)
             {
-                itemRowUI.onDragStarted -= ItemDragHandler;
-                itemRowUI.Dispose();
+                foreach (var itemRowUI in _inventoryItemRows.Where(x => x.Count == 0))
+                {
+                    itemRowUI.onDragStarted -= ItemDragHandler;
+                    itemRowUI.Dispose();
+                }
+                _inventoryItemRows.RemoveAll(x => x.Count == 0);
             }
-            _inventoryItemRows.RemoveAll(x => x.Count == 0);
 
+            Debug.Log($"{_inventoryStats.CollectedItems.Count} {_inventoryItemRows.Count}");
             foreach (var collectedItem in _inventoryStats.CollectedItems)
             {
-                if(collectedItem is null) break;
-                var rowItem = _inventoryItemRows
-                    .FirstOrDefault(x => x.ItemData == collectedItem.ItemData);
-                if (rowItem != null) break;
+                if(collectedItem is null) continue;
+                var rowItem = _inventoryItemRows.FirstOrDefault(x => x.ItemData == collectedItem.ItemData);
+                if (rowItem != null) continue;
                 var inventoryRowItem = _rowFactory.Create(collectedItem.ItemData);
                 inventoryRowItem.Count = collectedItem.Count;
                 inventoryRowItem.onDragStarted += ItemDragHandler;
@@ -160,6 +160,7 @@ namespace Inventory
                     }
                 }
             }
+            RefreshItemRows(true);
         }
         private Vector2Int PosOnGrid(Vector2 pos) => 
             (

@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace Inventory
 {
@@ -73,10 +74,10 @@ namespace Inventory
         
         public void Dispose()
         {
-            //Object.Destroy(_dragAbleUI.gameObject);
-            // _dragAbleUI.onDragStarted -= DragAbleUIOnDragStarted;
-            //_dragAbleUI.onDragProgress -= DragAbleUIOnDragProgress;
-            //_dragAbleUI.onDragFinished -= DragAbleUIOnDragFinished;
+            Object.Destroy(_dragAbleUI.transform.parent.gameObject);
+             _dragAbleUI.onDragStarted -= DragAbleUIOnDragStarted;
+            _dragAbleUI.onDragProgress -= DragAbleUIOnDragProgress;
+            _dragAbleUI.onDragFinished -= DragAbleUIOnDragFinished;
         }
     }
 }
