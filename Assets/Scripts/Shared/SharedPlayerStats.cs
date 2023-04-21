@@ -5,7 +5,7 @@ using Items;
 
 namespace Shared
 {
-    public class SharedPlayerStats: IInventoryStats
+    public class SharedPlayerStats: IInventoryStats, IEnergyStats
     {
         public SharedPlayerStats(PlayerSettings playerSettings)
         {
@@ -40,5 +40,7 @@ namespace Shared
                 CollectedItems.Remove(slot);
             }
         }
+
+        public int Energy { get; set; }
     }
 }

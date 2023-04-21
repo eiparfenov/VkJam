@@ -10,8 +10,9 @@ namespace Entities.Players
         private readonly SignalBus _signalBus;
         private readonly Transform _transform;
         private readonly CameraController _cameraController;
-        
         private Vector2Int _positionInPreviousFrame;
+
+        public Vector2 Position => _transform.position;
         
         public Player(SignalBus signalBus, 
             [Inject(Id = "Player")]Transform transform,

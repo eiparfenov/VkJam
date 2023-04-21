@@ -9,6 +9,9 @@ namespace Environment.Asteroids
     {
         private readonly SignalBus _signalBus;
         private Grid _mainGrid;
+
+        public Grid MainGrid => _mainGrid;
+
         public MainAsteroid( SignalBus signalBus)
         {
             _signalBus = signalBus;

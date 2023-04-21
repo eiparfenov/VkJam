@@ -13,5 +13,10 @@ namespace Utils.Extensions
         {
             return new Vector2Int(Mathf.RoundToInt(source.x), Mathf.RoundToInt(source.y));
         }
+
+        public static Vector2Int ToCellPosition(this Vector2 source)
+        {
+            return RoundToVector2Int(source - Vector2.one / 2);
+        }
     }
 }

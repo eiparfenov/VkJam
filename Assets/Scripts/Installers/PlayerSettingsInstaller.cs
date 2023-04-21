@@ -1,4 +1,5 @@
 using System;
+using Entities;
 using Items;
 using Shared;
 using UnityEngine;
@@ -13,13 +14,13 @@ namespace Installers
 
         public override void InstallBindings()
         {
-            Container.BindInstance(playerSettings).AsSingle();
+            Container.BindInterfacesAndSelfTo<PlayerSettings>().FromInstance(playerSettings).AsSingle();
             Container.BindInterfacesAndSelfTo<SharedPlayerStats>().AsSingle();
         }
     }
 
     [Serializable]
-    public class PlayerSettings
+    public class PlayerSettings: IMovementSettings
     {
         [field: SerializeField] public float MaxSpeed { get; private set; }
         [field: SerializeField] public float AccelerationTime { get; private set; }
