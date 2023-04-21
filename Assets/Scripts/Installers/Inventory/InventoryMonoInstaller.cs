@@ -17,6 +17,8 @@ namespace Installers.Inventory
         [SerializeField] private Transform inventoryRootObject;
         [SerializeField] private Transform itemDragContainer;
         [SerializeField] private Transform itemPlaceContainer;
+        [Space] 
+        [SerializeField] private InventoryOpenerByClick ship;
         public override void InstallBindings()
         {
             Container.BindFactory<ItemData, InventoryItemRowUI, InventoryItemRowUI.Factory>()
@@ -40,7 +42,7 @@ namespace Installers.Inventory
             Container.BindInstance(inventoryRootObject).AsCached().WhenInjectedInto<InventoryController>();
             Container.BindInterfacesAndSelfTo<InventoryController>()
                 .AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<TempInventoryOpener>().AsSingle().NonLazy();
+            Container.Inject(ship);
         }
     }
 }

@@ -29,7 +29,9 @@ namespace Installers
         [field: SerializeField] public Vector2Int FieldSize { get; private set; }
         [field: SerializeField] public int SidesOffset { get; private set; }
         [field: SerializeField] public int StartAsteroidSize { get; private set; }
+        [field: SerializeField] public Vector2Int LandingSite { get; private set; }
         [field: SerializeField] public int CreatedAsteroidMinSize { get; private set; }
         [field: SerializeField] public int CreatedAsteroidMaxSize { get; private set; }
+        [field: SerializeField] public int FreeAsteroidsCount { get; private set; }
     }
 }

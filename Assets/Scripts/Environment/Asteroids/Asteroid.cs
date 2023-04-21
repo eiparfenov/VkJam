@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Utils;
 using Utils.Extensions;
 using Zenject;
 using Grid = Grids.Grid;
@@ -14,8 +16,12 @@ namespace Environment.Asteroids
         public class Factory: PlaceholderFactory<AsteroidCreationData, Asteroid>{}
         private readonly DragAble _dragAble;
         private readonly IMover _mover;
-        private readonly Tilemap _tilemap;
-        private readonly TileBase _asteroidTile;
+        private readonly Tilemap _tilemapPhysic;
+        private readonly Tilemap _tilemapBackground;
+        private readonly Tilemap _tilemapMain;
+        private readonly TileBase _physicTile;
+        private readonly TileBase _backgroundTile;
+        private readonly RandomTile _asteroidTile;
         private readonly AsteroidCreationData _creationData;
         private readonly Transform _transform;
         private readonly SignalBus _signalBus;
@@ -25,17 +31,33 @@ namespace Environment.Asteroids
         public Vector2Int Position => ((Vector2)_transform.position).RoundToVector2Int();
         public Grid GridSelf => _creationData.Grid;
 
-        public Asteroid(DragAble dragAble, IMover mover, Tilemap tilemap, TileBase asteroidTile,
-            AsteroidCreationData creationData, Transform transform, SignalBus signalBus, Rigidbody2D rb)
+        public Asteroid(DragAble dragAble, 
+            IMover mover, 
+            Tilemap[] tilemaps, 
+            RandomTile asteroidTile,
+            AsteroidCreationData creationData, 
+            Transform transform, 
+            SignalBus signalBus, 
+            Rigidbody2D rb,
+            [Inject(Id = "Physic")] TileBase physicTile,
+            [Inject(Id = "Background")] TileBase backgroundTile
+            )
         {
             _dragAble = dragAble;
             _mover = mover;
-            _tilemap = tilemap;
             _asteroidTile = asteroidTile;
             _creationData = creationData;
             _transform = transform;
             _signalBus = signalBus;
             _rb = rb;
+
+            _backgroundTile = backgroundTile;
+            _physicTile = physicTile;
+
+            _tilemapMain = tilemaps.First(x => x.name == "Main");
+            _tilemapPhysic = tilemaps.First(x => x.name == "Physics");
+            _tilemapBackground = tilemaps.First(x => x.name == "Background");
+            
             
             _transform.position = creationData.StartPos.ToVector3Int();
         }
@@ -57,7 +79,10 @@ namespace Environment.Asteroids
             var grid = _creationData.Grid;
             foreach (var gridCell in grid.AllCells)
             {
-                _tilemap.SetTile(gridCell.ToVector3Int() ,_asteroidTile);
+                var pos = gridCell.ToVector3Int();
+                _tilemapMain.SetTile(pos ,_asteroidTile.Tile);
+                _tilemapPhysic.SetTile(pos, _physicTile);
+                _tilemapBackground.SetTile(pos, _backgroundTile);
             }
         }
 

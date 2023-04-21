@@ -21,7 +21,7 @@ namespace Installers
             Container.Bind<Rigidbody2D>().FromComponentOnRoot().AsSingle();
             Container.Bind<DragAble>().FromNewComponentOnRoot().AsSingle();
             Container.Bind<IMover>().To<PhysicalMover>().FromNewComponentOnRoot().AsSingle();
-            Container.Bind<Tilemap>().FromComponentOnRoot().AsSingle();
+            Container.Bind<Tilemap>().FromComponentsInHierarchy().AsCached();
             Container.BindInterfacesAndSelfTo<Asteroid>().AsSingle();
         }
     }
